@@ -1,0 +1,21 @@
+{
+  "name": "Pulpería García",
+  "short_name": "Pulpería",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2E7D32",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "Garcia.png",
+      "sizes": "192x192",
+      "type": "Garcia/png"
+    },
+    {
+      "src": "Garcia.png",
+      "sizes": "512x512",
+      "type": "Garcia/png"
+    }
+  ]
+}

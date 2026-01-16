@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2E7D32">
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulpería García</title>
+<style>
+:root{
+  --color-primario:#007BFF;
+  --color-acento:#FF6600;
+  --color-fondo:#f9f9f9;
+  --color-boton:#3399FF;
+  --color-boton-hover:#FF9933;
+  --color-secundario:#FF3300;
+}
+body{
+  font-family: Arial, sans-serif;
+  margin:0;padding:0;
+  background:var(--color-fondo);
+}
+h1{text-align:center;color:var(--color-primario);margin:15px;}
+.container{
+  max-width:900px;margin:20px auto;padding:15px;
+  background:#fff;border-radius:10px;
+  box-shadow:0 0 15px rgba(0,0,0,0.2);
+}
+button{cursor:pointer;}
+.dashboard, .calculadora, .ajustes{display:none;}
+.section-btn{
+  width:100%;
+  padding:15px;
+  margin:5px 0;
+  font-size:18px;
+  font-weight:bold;
+  color:#fff;
+  background:var(--color-boton);
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  text-align:left;
+}
+.section-btn:hover{background:var(--color-boton-hover);}
+.products, .ajustes-categoria{
+  display:none;
+  padding:10px 15px;
+  border-left:3px solid var(--color-acento);
+  margin-bottom:10px;
+}
+.products button, .ajustes-categoria button{
+  width:calc(50% - 10px);
+  margin:5px;
+  background:var(--color-acento);
+  color:#fff;
+  border:none;
+  border-radius:5px;
+  padding:10px;
+  cursor:pointer;
+  font-size:16px;
+}
+.products button:hover, .ajustes-categoria button:hover{background:#FF3300;}
+#totalVenta{
+  font-size:24px;
+  font-weight:bold;
+  text-align:center;
+  margin:15px 0;
+  color:var(--color-primario);
+}
+#resetBtn{
+  display:block;
+  width:50%;
+  margin:0 auto 20px auto;
+  padding:12px;
+  font-size:18px;
+  font-weight:bold;
+  background:var(--color-secundario);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+}
+#resetBtn:hover{background:#CC2900;}
+input, select{
+  padding:8px;
+  margin:5px 0;
+  width:100%;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+input[type=number]{-moz-appearance:textfield;}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.producto-item{padding:8px;border-bottom:1px solid #ccc;display:flex;justify-content:space-between;align-items:center;}
+.producto-item > button{margin-left:5px;padding:5px;font-size:14px;}
+.ajustes-categoria h4{margin:5px 0;}
+#buscador{
+  padding:10px;
+  font-size:16px;
+  margin-bottom:10px;
+  width:100%;
+  border-radius:5px;
+  border:1px solid #ccc;
+}
+#listaVenta{
+  margin-top:15px;
+  border-top:1px solid #ccc;
+  padding-top:10px;
+}
+#listaVenta div{
+  display:flex;
+  justify-content:space-between;
+  padding:3px 0;
+}
+@media(max-width:600px){
+  .products button, .ajustes-categoria button{width:100%;}
+  .section-btn{font-size:16px;}
+}
+</style>
+</head>
+<body>
+<h1>Pulpería García</h1>
+<div class="container">
+
+  <!-- DASHBOARD -->
+  <div class="dashboard">
+    <h2>Dashboard</h2>
+    <button onclick="abrirCalculadora()" class="section-btn">Ir a Calculadora</button>
+    <button onclick="abrirAjustes()" class="section-btn">Ajustes</button>
+    <div id="resumenVentas">
+      <h3>Resumen de Compras</h3>
+      <p id="totalVentasDia">Total del día: L.0</p>
+    </div>
+  </div>
+
+  <!-- CALCULADORA -->
+  <div class="calculadora">
+    <button onclick="abrirDashboard()" class="section-btn" style="background:#FF3300;">← Volver al Dashboard</button>
+    <input type="text" id="buscador" placeholder="Buscar producto...">
+    <div id="sectionsContainer"></div>
+    <div id="totalVenta">Total: L.0</div>
+    <div id="listaVenta"></div>
+    <button id="resetBtn" onclick="resetVenta()">Reiniciar Compra</button>
+  </div>
+
+  <!-- AJUSTES -->
+  <div class="ajustes">
+    <button onclick="abrirDashboard()" class="section-btn" style="background:#FF3300;">← Volver al Dashboard</button>
+    <h3>Administrar Productos</h3>
+    <div>
+      <select id="selectCategoria"></select>
+      <input type="text" id="nombreProducto" placeholder="Nombre del producto">
+      <input type="number" id="precioProducto" placeholder="Precio L.">
+      <button onclick="agregarProducto()" class="section-btn">Agregar Producto</button>
+    </div>
+    <h4>Lista de Productos</h4>
+    <div id="listaProductos"></div>
+  </div>
+
+</div>
+
+<script>
+// ---------------------
+// DATOS DE PRODUCTOS COMPLETOS
+// ---------------------
+let productos = {
+  "Medicamentos":[
+    "Acetaminofen 78","Acetaminofen MK 155","Aleve 180","Amoxicilina 81","Artibion 190",
+    "Iboprodol 150","Iboprodol ultra 190","Ibuprofeno 51","Mentolina Pequeña 330",
+    "Nerviotiamina 220","Panadol azul 250","Panadol multisintoma 220","Panadol mujer 155",
+    "Panadol niño 186","Panadol ultra 360","Prond Blister 35","Reumapirin 145",
+    "Salandrews 215","Sulfabismuto 120","Sulfatiasol 238","Tabcin efervecente 290",
+    "Tabcin Gel GyT 375","Tabcin Niño 145","Tevirin 358","Tapon 120","Tosan adulto 75",
+    "Tosan niño 75","Vick lata 160","Pastilla vick 176","Vitaflenaco 102","Doloneurobion sun 25",
+    "Curitas 35","Alkazelser 220","Sudagrip Te 140","Magnesia Scott 330",
+    "Sal inglesa 126","Bicarbonato 180","Magnesia philips 330","Gasas 100","Peptobismol 60",
+    "Vetaderm 300","Mrel balsámica 40","Alcohol 50","Agua oxigenada 45","Alcochol medicado",
+    "Suero dralectil 31","Hierro vit 51","Aceite niño 105","Loratadina 75","Mevalgin 155",
+    "Uropirin 120","Neuroforza 78"
+  ],
+  "Limpieza":[
+    "Aceite 3 en 1 95","Ambiental Glado","Azistin izun 190","Baterías grande 346","Corta uña grande 230",
+    "Corta uña pequeño 145","Doc peine fino 248","Downy 80","Escoba izun 500","Encendedores 108",
+    "Fardo cloro 305","Fardo papel Scott 435","Foco led 12w 192","Jabón Palmolive 222","Jabón Protex 222",
+    "Jabón Unox 250","Jabón Limpiox 320","Lima india 250","Mecha trapeador 27","Paste aluminio 35",
+    "Paste verde barato 28","Paste baño 185","Paquete candado 260","Paquete prestobarba gillete 470",
+    "Paquete prestobarba vick 190","Palo trapeador 33","Polvo nodor 37","Rastrillo gris","Rastrillos trapper 110",
+    "Repelente 120g off 67","Repelente off 100 94","Repelente off spray 105","Ristra baterías AA 95",
+    "Risra baterías AAA 100","Super blue 53","Tijera 2pk 17","Tijera de barber 34","Toalla humeda 100unid 38",
+    "Tape negro 75","Vaselina simple 65","Ganchos tender ropa 33"
+  ],
+  "Condimentos y Salsas":[
+    "Avena grande 25","Bolsa cubitos 88","Caja candela 670","Caja consome 930","Caja cornflake fans 984",
+    "Caja manteca libra 980","Caja palomia azul 370","Café catracho 70","Café medalla 105","Café oro 108",
+    "Cereal 165","Cereal trigo miel 55","Colgate blanca 265","Colgate triple 255","Consome 27","Crema pequeña 48",
+    "Crema 192","Fardo espaquetis 370","Fardo plato 260","Fardo servilleta 115","Fardo fosforo 380",
+    "Frijol 940","Frijol campo fresco 110","Frijol campo fresco 116","Harina doña blanca 225","Leche nido 118",
+    "Maicena bebe 125","Maseca xtra suave 250","Multipack 160","Pet master perro 550","Risra avena 67",
+    "Risra azafran 21","Risra chocopanda 30","Risra consome camaron 28","Risra consome costilla 26",
+    "Risra recado 26","Risra sal de ajo 21","Salbronca 50","Salfina pacifico 130","Salfina yodada 130",
+    "Salsina 133","Sofrito 133","Sofrito picante 120","Sopa instantánea 165","Tallarines guni 60",
+    "Vainilla 105"
+  ],
+  "Golosinas":[
+    "Alca azul 57","Bote gelatina 76","Bon o bon 120","Bon o bon rojo 38","Bubaloo 60",
+    "Chao 48","Club social 28","Confite mango 55","Crayones 105","Fusion 55","Galleta oreo 73",
+    "Inyección 75","Leche condensada 35","Paleta tipitin 25","Paleta truina pop 120","Tableta coco R 45",
+    "Trululu 120","Yerba buena 58","Culebrita 85","Bolsa confite sudragrip 100"
+  ],
+  "Accesorios de Limpieza y Cuerpo":[
+    "Degree hombre 80","Degree mujer 333","Desodorante axe 173","Desodorante Gillette","Desodorante secret 126",
+    "Dove mujer spray 66","Doc chinola medianas diamond 210","Ego bote 135","Ego sobre 70","Pantene liso 77",
+    "Pantene rizo shampoo 75","Pinzas 40","Paq peine fino 203","Rexona hombre 975","Rexona mujer 975",
+    "Sedal crema 80","Sedal negro 65","Sedal rojo 65","Sedal rosado 65","Sholder rosa 78","Vaselina simple 72"
+  ],
+  "Producto en Lata":[
+    "Chorchita peq 90","Maíz peq 120","Leche coco el migo 240","Leche coco past 204","Condensada grande 210",
+    "Condensada peq 921","Costeña mediana 120","Costeña P 85","Salsa inlesa 125","Salsa soya 125",
+    "Sardina picante 114","Sardinas sin picar p 210","Vegetal 150"
+  ]
+};
+
+// ---------------------
+// VARIABLES
+// ---------------------
+let totalVenta = 0;
+let totalDia = 0;
+let listaSeleccion = {}; // Aquí guardamos la cantidad de cada producto
+const sectionsContainer = document.getElementById("sectionsContainer");
+const listaProductosDiv = document.getElementById("listaProductos");
+const selectCategoria = document.getElementById("selectCategoria");
+const buscador = document.getElementById("buscador");
+const listaVentaDiv = document.getElementById("listaVenta");
+
+// ---------------------
+// FUNCIONES DE NAVEGACION
+// ---------------------
+function abrirDashboard(){
+  document.querySelector(".dashboard").style.display="block";
+  document.querySelector(".calculadora").style.display="none";
+  document.querySelector(".ajustes").style.display="none";
+  document.getElementById("totalVentasDia").textContent = "Total del día: L."+totalDia;
+}
+function abrirCalculadora(){
+  document.querySelector(".dashboard").style.display="none";
+  document.querySelector(".calculadora").style.display="block";
+  document.querySelector(".ajustes").style.display="none";
+  crearSecciones();
+  actualizarListaVenta();
+}
+function abrirAjustes(){
+  document.querySelector(".dashboard").style.display="none";
+  document.querySelector(".calculadora").style.display="none";
+  document.querySelector(".ajustes").style.display="block";
+  actualizarListaProductos();
+  actualizarCategorias();
+}
+
+// ---------------------
+// FUNCIONES CALCULADORA
+// ---------------------
+function agregarItem(nombre, precio){
+  totalVenta += parseFloat(precio);
+  totalDia += parseFloat(precio);
+
+  // Actualizamos la lista de productos seleccionados
+  if(listaSeleccion[nombre]){
+    listaSeleccion[nombre].cantidad += 1;
+  }else{
+    listaSeleccion[nombre] = {precio: parseFloat(precio), cantidad:1};
+  }
+  document.getElementById("totalVenta").textContent = "Total: L." + totalVenta;
+  actualizarListaVenta();
+}
+
+function actualizarListaVenta(){
+  listaVentaDiv.innerHTML="";
+  for(const prod in listaSeleccion){
+    const div = document.createElement("div");
+    div.textContent = `${listaSeleccion[prod].cantidad} x ${prod} - L.${listaSeleccion[prod].precio*listaSeleccion[prod].cantidad}`;
+    listaVentaDiv.appendChild(div);
+  }
+}
+
+function resetVenta(){
+  totalVenta = 0;
+  listaSeleccion = {};
+  document.getElementById("totalVenta").textContent = "Total: L.0";
+  actualizarListaVenta();
+}
+
+// ---------------------
+// CREAR SECCIONES Y BOTONES
+// ---------------------
+function crearSecciones(filtro=""){
+  sectionsContainer.innerHTML="";
+  for(const cat in productos){
+    const btn = document.createElement("button");
+    btn.className = "section-btn";
+    btn.textContent = cat;
+
+    const div = document.createElement("div");
+    div.className = "products";
+    btn.onclick = ()=>{div.style.display = div.style.display==="none"?"block":"none";};
+
+    const listaProd = productos[cat].slice().sort();
+    listaProd.forEach(p=>{
+      const match = p.match(/(.+)\s+(\d+)$/);
+      if(!match) return;
+      const nombre = match[1];
+      const precio = match[2];
+      if(filtro && !nombre.toLowerCase().includes(filtro.toLowerCase()) && !cat.toLowerCase().includes(filtro.toLowerCase())) return;
+      const b = document.createElement("button");
+      b.textContent = `${nombre} - L.${precio}`;
+      b.onclick = ()=>agregarItem(nombre, precio);
+      div.appendChild(b);
+    });
+
+    if(div.childElementCount>0){
+      sectionsContainer.appendChild(btn);
+      sectionsContainer.appendChild(div);
+    }
+  }
+}
+
+// ---------------------
+// BUSCADOR
+// ---------------------
+buscador.addEventListener("input", ()=>crearSecciones(buscador.value));
+
+// ---------------------
+// FUNCIONES AJUSTES CON DESPLEGABLES
+// ---------------------
+function actualizarCategorias(){
+  selectCategoria.innerHTML="";
+  for(const cat in productos){
+    const opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    selectCategoria.appendChild(opt);
+  }
+}
+
+function actualizarListaProductos(){
+  listaProductosDiv.innerHTML="";
+  for(const cat in productos){
+    const catBtn = document.createElement("button");
+    catBtn.className="section-btn";
+    catBtn.textContent=cat;
+    const catDiv = document.createElement("div");
+    catDiv.className="ajustes-categoria";
+    catBtn.onclick = ()=>{catDiv.style.display = catDiv.style.display==="none"?"block":"none";};
+
+    productos[cat].forEach(p=>{
+      const match = p.match(/(.+)\s+(\d+)$/);
+      if(!match) return;
+      const nombre = match[1];
+      const precio = match[2];
+      const prodDiv = document.createElement("div");
+      prodDiv.className="producto-item";
+      const span = document.createElement("span");
+      span.textContent = `${nombre} - L.${precio}`;
+      const editar = document.createElement("button");
+      editar.textContent="Editar";
+      editar.onclick=()=>editarProducto(cat,nombre,precio);
+      const eliminar = document.createElement("button");
+      eliminar.textContent="Eliminar";
+      eliminar.onclick=()=>eliminarProducto(cat,p);
+      prodDiv.appendChild(span);
+      prodDiv.appendChild(editar);
+      prodDiv.appendChild(eliminar);
+      catDiv.appendChild(prodDiv);
+    });
+
+    listaProductosDiv.appendChild(catBtn);
+    listaProductosDiv.appendChild(catDiv);
+  }
+}
+
+function agregarProducto(){
+  const cat = selectCategoria.value;
+  const nombre = document.getElementById("nombreProducto").value.trim();
+  const precio = document.getElementById("precioProducto").value.trim();
+  if(nombre && precio){
+    productos[cat].push(nombre+" "+precio);
+    actualizarListaProductos();
+    crearSecciones();
+    document.getElementById("nombreProducto").value="";
+    document.getElementById("precioProducto").value="";
+  }
+}
+
+function eliminarProducto(cat, producto){
+  const idx = productos[cat].indexOf(producto);
+  if(idx>=0) productos[cat].splice(idx,1);
+  actualizarListaProductos();
+  crearSecciones();
+}
+
+function editarProducto(cat, nombre, precio){
+  const nuevoNombre = prompt("Nuevo nombre:", nombre);
+  const nuevoPrecio = prompt("Nuevo precio:", precio);
+  if(nuevoNombre && nuevoPrecio){
+    const idx = productos[cat].indexOf(nombre+" "+precio);
+    if(idx>=0) productos[cat][idx] = nuevoNombre+" "+nuevoPrecio;
+    actualizarListaProductos();
+    crearSecciones();
+  }
+}
+
+// ---------------------
+// INICIO
+// ---------------------
+abrirDashboard();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js")
+      .then(() => console.log("Service Worker registrado"))
+      .catch(err => console.error("SW error", err));
+  });
+}
+</script>
+
+</body>
+</html>
