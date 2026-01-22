@@ -10,12 +10,12 @@
     {
       "src": "Garcia.png",
       "sizes": "192x192",
-      "type": "Garcia/png"
+      "type": "image/png"
     },
     {
       "src": "Garcia.png",
       "sizes": "512x512",
-      "type": "Garcia/png"
+      "type": "image/png"
     }
   ]
 }
