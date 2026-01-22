@@ -416,33 +416,8 @@ function editarProducto(cat, nombre, precio){
 // ---------------------
 abrirDashboard();
 </script>
-<script>
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./service-worker.js")
-      .then(() => console.log("Service Worker registrado"))
-      .catch(err => console.error("SW error", err));
-  });
-}
-</script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script>
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
 
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = "block";
-
-  installBtn.addEventListener("click", async () => {
-    installBtn.style.display = "none";
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-  });
-});
-</script>
 
 </body>
 </html>

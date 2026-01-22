@@ -1,7 +1,7 @@
 {
   "name": "Pulpería García",
   "short_name": "Pulpería",
- "start_url": "/pulperia-garcia-app/index.html",
+ "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#2E7D32",
