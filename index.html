@@ -121,9 +121,7 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
 <h1>Pulpería García</h1>
 <div class="container">
 
- 
-</button>
-<button id="installBtn" style="display:none;">
+<button id="installBtn" style="display:none;" class="section-btn">
   📲 Descargar App
 </button>
 
@@ -428,6 +426,23 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = "block";
+
+  installBtn.addEventListener("click", async () => {
+    installBtn.style.display = "none";
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+  });
+});
+</script>
 
 </body>
 </html>
