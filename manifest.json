@@ -8,12 +8,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "Garcia.png",
+      "src": "icons/garcia-192.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "Garcia.png",
+      "src": "icons/garcia-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
